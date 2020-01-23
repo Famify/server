@@ -17,7 +17,7 @@ const taskSchema = new Schema({
     enum: ['unclaimed', 'claimed', 'finished'],
     default: 'unclaimed'
   },
-  familyID: {
+  familyId: {
     type: String,
     required: [true, 'familyID harus diisi.']
   },
