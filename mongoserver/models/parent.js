@@ -1,46 +1,46 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, mongo } = require('mongoose')
 const { hashPassword, checkPassword } = require('../helpers/bcrypt')
 
-const userSchema = new Schema({
+const parentSchema = new Schema({
     username: {
         type: String,
         required: [true, ''],
         validate: [
-            {validator: isUsernameUnique, message: 'username already registered'}
+            {validator: isUsernameUnique, message: 'nama pengguna telah digunakan'}
         ]
     },
     email: {
         type: String,
-        required: [true, 'email is required'],
-        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'invalid email format'],
+        required: [true, 'email wajib diisi'],
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'format email invalid'],
         validate: [
-            {validator: isEmailUnique, message: 'email already registered'}
+            {validator: isEmailUnique, message: 'email telah teregistrasi'}
         ],
     },
     password: {
         type: String,
-        required: [true, 'password required'],
-        minlength: [8, 'password min 8 char']
+        required: [true, 'password wajib diisi'],
+        minlength: [8, 'password minimal 8 karakter']
     },
     childrens: [{
         type: Schema.Types.ObjectId
     }],
-    familyId: Schema.Types.ObjectId
+    familyId: new mongo.ObjectId()
 }, {
     timestamps: true
 })
 
 //validation
 function isEmailUnique(value) {
-    return User.findOne({ email: value })
+    return Parent.findOne({ email: value })
       .then(found => {
         if (found) return false
         else return true
       })
   }
 
-function isNameUnique(value) {
-    return User.findOne({ name: value })
+function isUsernameUnique(value) {
+    return Parent.findOne({ name: value })
       .then(found => {
         if (found) return false
         else return true
@@ -48,11 +48,11 @@ function isNameUnique(value) {
   }
   
 //hashPassword
-userSchema.pre('save', function(next) {
+parentSchema.pre('save', function(next) {
     this.password = hashPassword(this.password)
     next()
 })
 
-const User = model('User', userSchema)
+const Parent = model('Parent', parentSchema)
 
-module.exports = User
+module.exports = Parent
