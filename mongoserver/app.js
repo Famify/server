@@ -26,4 +26,5 @@ app.use(errorHandler)
 app.listen(PORT, () => {
     console.log('listening port ', PORT);
 })
+
 module.exports = app

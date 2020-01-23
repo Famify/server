@@ -15,15 +15,17 @@ const taskSchema = new Schema({
   status: {
     type: String,
     enum: ['unclaimed', 'claimed', 'finished'],
-    default: 'unclaimed',
-    required: [true, 'Status tugas harus diisi.']
+    default: 'unclaimed'
   },
-  familyID: {
+  familyId: {
     type: String,
     required: [true, 'familyID harus diisi.']
   },
   image: {
     type: String
+  },
+  deadline: {
+    type: Date
   }
 })
 

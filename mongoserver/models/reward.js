@@ -16,15 +16,12 @@ const rewardSchema = new Schema({
     type: Boolean,
     default: true
   },
-  familyID: {
+  familyId: {
     type: String,
     required: [true, 'familyID harus diisi.']
   },
   image: {
     type: String
-  },
-  deadline: {
-    type: Date
   }
 })
 
