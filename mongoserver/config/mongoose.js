@@ -3,9 +3,9 @@ const mongoose = require('mongoose')
 
 if (process.env.NODE_ENV === 'testing') {
     console.log('masuk testing')
-    mongoUri = 'mongodb://localhost:27017/click-testing'
+    mongoUri = 'mongodb://localhost:27017/famify-testing'
 } else {
-    mongoUri = 'mongodb://localhost:27017/click-development'
+    mongoUri = 'mongodb://localhost:27017/famify-development'
     // mongoUri = process.env.MONGO_URI
 }
 
