@@ -22,6 +22,9 @@ const rewardSchema = new Schema({
   },
   image: {
     type: String
+  },
+  deadline: {
+    type: Date
   }
 })
 
