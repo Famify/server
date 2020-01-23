@@ -1,5 +1,6 @@
-const { Schema, model, mongo } = require('mongoose')
+const { Schema, model, Types } = require('mongoose')
 const { hashPassword, checkPassword } = require('../helpers/bcrypt')
+const uuidv1 = require('uuid/v1')
 
 const parentSchema = new Schema({
     username: {
@@ -25,7 +26,11 @@ const parentSchema = new Schema({
     childrens: [{
         type: Schema.Types.ObjectId
     }],
-    familyId: new mongo.ObjectId()
+    familyId: {type: String, default: function genUUID() {
+        return uuidv1()
+    }},
+    avatar: String,
+    role: String
 }, {
     timestamps: true
 })
