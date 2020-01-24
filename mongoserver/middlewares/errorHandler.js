@@ -1,5 +1,5 @@
 function errorHandler(err, req, res, next) {
-  // console.log('err handler atas', err)
+  // console.log('err handler atas', err.message)
 
   let status, message, error = []
 
@@ -15,12 +15,12 @@ function errorHandler(err, req, res, next) {
 
   } else if (err.name === 'JsonWebTokenError') {
     status = 401
-    error.push('Mohon log in terlebih dahulu.')
+    error.push('Mohon sign in terlebih dahulu.')
 
   } else {
     if (err.status) status = err.status
     else status = 500
-    error.push(err)
+    error.push(err.message)
   }
 
   res.status(status).json({ error })

@@ -1,228 +1,413 @@
-// const chai = require('chai')
-// const chaiHttp = require('chai-http')
-// const app = require('../app')
-// const { generateToken } = require('../helpers/jwt')
+const chai = require('chai')
+const chaiHttp = require('chai-http')
+const app = require('../app')
+const { generateToken } = require('../helpers/jwt')
 
-// const Parent = require('../models/parent')
-// const Reward = require('../models/reward')
+const Parent = require('../models/parent')
+const Reward = require('../models/reward')
 
-// const expect = chai.expect
-// chai.use(chaiHttp)
+const expect = chai.expect
+chai.use(chaiHttp)
 
-// let currentAccessToken, familyId, rewardId
+let currentAccessToken, familyId, rewardId, currentAccessToken2, familyId2, rewardId2
 
-// describe('CRUD rewards', () => {
+let wrongRewardId = '5e2a9096a8cbfc79123feed9'
 
-//   beforeEach((done) => {
-//     Parent
-//       .create({
-//         username: 'initial',
-//         email: 'initial@mail.com',
-//         password: 'initial123',
-//         role: 'parent',
-//         dateOfBirth: new Date()
-//       })
-//       .then(parent => {
-//         const payload = {
-//           _id: parent._id,
-//           username: parent.username,
-//           email: parent.email,
-//           role: parent.role,
-//           familyId: parent.familyId
-//         }
-//         currentAccessToken = generateToken(payload)
-//         familyId = parent.familyId
+describe('CRUD rewards', () => {
 
-//         chai
-//           .request(app)
-//           .post('/rewards')
-//           .send({
-//             title: 'Initial reward',
-//             description: 'Initial reward my children can claim',
-//             points: 5000
-//           })
-//           .set('access_token', currentAccessToken)
-//           .end((err, res) => {
-//             rewardId = res.body.newReward._id
-//             done()
-//           })
-//       })
-//       .catch(err => console.log(err))
-//   })
+  beforeEach((done) => {
+    Parent
+      .create({
+        username: 'initial',
+        email: 'initial@mail.com',
+        password: 'initial123',
+        role: 'parent',
+        dateOfBirth: new Date()
+      })
+      .then(parent => {
+        const payload = {
+          _id: parent._id,
+          username: parent.username,
+          email: parent.email,
+          role: parent.role,
+          familyId: parent.familyId
+        }
+        currentAccessToken = generateToken(payload)
+        familyId = parent.familyId
 
-//   afterEach(done => {
-//     Parent
-//       .deleteMany()
-//       .then(() => Reward.deleteMany())
-//       .then(() => done())
-//       .catch(err => console.log(err))
-//   })
+        return Parent
+          .create({
+            username: 'initial2',
+            email: 'initial2@mail.com',
+            password: 'initial2-123',
+            role: 'parent',
+            dateOfBirth: new Date()
+          })
+      })
+      .then(parent => {
+        const payload = {
+          _id: parent._id,
+          username: parent.username,
+          email: parent.email,
+          role: parent.role,
+          familyId: parent.familyId
+        }
+        currentAccessToken2 = generateToken(payload)
+        familyId2 = parent.familyId
 
-//   describe('GET /rewards', () => {
-//     it('should return all existing rewards that have user`s familyId', done => {
-//       chai
-//         .request(app)
-//         .get('/rewards')
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
+        chai
+          .request(app)
+          .post('/rewards')
+          .send({
+            title: 'Initial reward',
+            description: 'Initial reward my children can claim',
+            points: 5000
+          })
+          .set('access_token', currentAccessToken)
+          .end((err, res) => {
+            rewardId = res.body.newReward._id
 
-//           expect(err).to.be.null
-//           expect(res).to.have.status(200)
-//           expect(res.body).to.be.an('array')
+            chai
+              .request(app)
+              .post('/rewards')
+              .send({
+                title: 'Initial reward',
+                description: 'Initial reward my children can claim',
+                points: 5000
+              })
+              .set('access_token', currentAccessToken2)
+              .end((err, res) => {
+                rewardId2 = res.body.newReward._id
+                done()
+              })
+          })
+      })
+      .catch(err => console.log(err))
+  })
 
-//           res.body.forEach(obj => {
-//             expect(obj.familyId === familyId)
-//           })
+  afterEach(done => {
+    Parent
+      .deleteMany()
+      .then(() => Reward.deleteMany())
+      .then(() => done())
+      .catch(err => console.log(err))
+  })
 
-//           done()
-//         })
-//     })
-//   })
+  describe('GET /rewards', () => {
+    it('should return all existing rewards that have user`s familyId', done => {
+      chai
+        .request(app)
+        .get('/rewards')
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
 
-//   describe('GET /rewards/:id', () => {
-//     it('should return a reward with the same id as param', done => {
-//       chai
-//         .request(app)
-//         .get('/rewards/' + rewardId)
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
-//           expect(err).to.be.null
-//           expect(res).to.have.status(200)
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body._id).to.eql(rewardId)
+          res.body.forEach(obj => {
+            expect(obj.familyId === familyId)
+          })
 
-//           done()
-//         })
-//     })
+          done()
+        })
+    })
+  })
 
-//     it.only('should return an error message when the param is not found in the database', done => {
-//       chai
-//         .request(app)
-//         .get('/rewards/' + 'wrong-id')
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
-//           expect(err).to.be.null
-//           expect(res).to.have.status(404)
+  describe('GET /rewards/:id', () => {
+    it('should return a reward with the same id as param', done => {
+      chai
+        .request(app)
+        .get('/rewards/' + rewardId)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body.message).to.be.undefined
+          expect(res.body).to.be.an('object')
+          expect(res.body._id).to.eql(rewardId)
 
-//           expect(res.body.error).to.be.an('array')
-//           expect(res.body.error[0]).to.eql('Data tidak ditemukan.')
-//           done()
-//         })
-//     })
-//   })
+          done()
+        })
+    })
 
-//   describe('POST /rewards', () => {
-//     it('should return a success message when all required fields are filled', done => {
-//       chai
-//         .request(app)
-//         .post('/rewards')
-//         .send({
-//           title: 'Reward',
-//           description: 'Reward my children can claim',
-//           points: 1000
-//         })
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
+    it('should return an error message when the rewardId is not found in the database', done => {
+      chai
+        .request(app)
+        .get('/rewards/' + wrongRewardId)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(404)
 
-//           expect(err).to.be.null
-//           expect(res).to.have.status(201)
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body.message).to.be.a('string')
-//           expect(res.body.message).to.eql('Berhasil menambahkan hadiah baru.')
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Data tidak ditemukan.')
+          done()
+        })
+    })
+  })
 
-//           done()
-//         })
-//     })
+  describe('POST /rewards', () => {
+    it('should return a success message when all required fields are filled', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: 'Reward',
+          description: 'Reward my children can claim',
+          points: 1000
+        })
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
 
-//     it('should return an error when no title is inputted', done => {
-//       chai
-//         .request(app)
-//         .post('/rewards')
-//         .send({
-//           title: '',
-//           description: 'Reward my children can claim',
-//           points: 1000
-//         })
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(201)
 
-//           expect(err).to.be.null
-//           expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Berhasil menambahkan hadiah baru.')
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body.message).to.be.undefined
+          done()
+        })
+    })
 
-//           expect(res.body.error).to.be.an('array')
-//           expect(res.body.error[0]).to.eql('Mohon masukkan nama hadiah.')
+    it('should return an error when no title is inputted', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: '',
+          description: 'Reward my children can claim',
+          points: 1000
+        })
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
 
-//           done()
-//         })
-//     })
+          expect(err).to.be.null
+          expect(res).to.have.status(400)
 
-//     it('should return an error when points field is empty', done => {
-//       chai
-//         .request(app)
-//         .post('/rewards')
-//         .send({
-//           title: 'Reward',
-//           description: 'Reward my children can claim',
-//           points: ''
-//         })
-//         .set('access_token', currentAccessToken)
-//         .end((err, res) => {
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
 
-//           expect(err).to.be.null
-//           expect(res).to.have.status(400)
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon masukkan nama hadiah.')
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body.message).to.be.undefined
+          done()
+        })
+    })
 
-//           expect(res.body.error).to.be.an('array')
-//           expect(res.body.error[0]).to.eql('Mohon masukkan poin yang perlu ditukarkan untuk mengklaim hadiah ini.')
+    it('should return an error when points field is empty', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: 'Reward',
+          description: 'Reward my children can claim',
+          points: ''
+        })
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
 
-//           done()
-//         })
-//     })
+          expect(err).to.be.null
+          expect(res).to.have.status(400)
 
-//     it('should return an error when user has not logged in', done => {
-//       chai
-//         .request(app)
-//         .post('/rewards')
-//         .send({
-//           title: 'Reward',
-//           description: 'Reward my children can claim',
-//           points: 1000
-//         })
-//         .end((err, res) => {
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
 
-//           expect(err).to.be.null
-//           expect(res).to.have.status(401)
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon masukkan poin yang perlu ditukarkan untuk mengklaim hadiah ini.')
 
-//           expect(res.body).to.be.an('object')
-//           expect(res.body.message).to.be.undefined
+          done()
+        })
+    })
 
-//           expect(res.body.error).to.be.an('array')
-//           expect(res.body.error[0]).to.eql('Mohon log in terlebih dahulu.')
+    it('should return an error when user has not signed in', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: 'Reward',
+          description: 'Reward my children can claim',
+          points: 1000
+        })
+        .end((err, res) => {
 
-//           done()
-//         })
-//     })
-//   })
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
 
-//   // describe('PUT /rewards/:id', () => {
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
 
-//   // })
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon sign in terlebih dahulu.')
 
-//   // describe('PATCH /rewards/:id', () => {
+          done()
+        })
+    })
+  })
 
-//   // })
+  describe('PUT /rewards/:id', () => {
+    it('when successful should update a reward item', done => {
 
-//   // describe('DELETE /rewards/:id', () => {
+      const updateQuery = {
+        title: 'Updated reward',
+        description: 'New reward my children can claim',
+        points: 6000
+      }
 
-//   // })
-// })
+      chai
+        .request(app)
+        .put('/rewards/' + rewardId)
+        .send(updateQuery)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Berhasil memperbaharui hadiah.')
+
+          expect(res.body.updatedReward).to.be.an('object')
+          expect(res.body.updatedReward.title).to.eql(updateQuery.title)
+          expect(res.body.updatedReward.description)
+            .to.eql(updateQuery.description)
+          expect(res.body.updatedReward.points).to.eql(updateQuery.points)
+
+          done()
+        })
+    })
+
+    it('should return an error message when a wrong rewardId is inputted', done => {
+      const updateQuery = {
+        title: 'Updated reward',
+        description: 'New reward my children can claim',
+        points: 6000
+      }
+
+      chai
+        .request(app)
+        .put('/rewards/' + wrongRewardId)
+        .send(updateQuery)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(404)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.updatedReward).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Data tidak ditemukan.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when user is unauthorized to update', done => {
+      const updateQuery = {
+        title: 'Updated reward',
+        description: 'New reward my children can claim',
+        points: 6000
+      }
+
+      chai
+        .request(app)
+        .put('/rewards/' + rewardId)
+        .send(updateQuery)
+        .set('access_token', currentAccessToken2)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.updatedReward).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+    })
+  })
+
+  describe('DELETE /rewards/:id', () => {
+    it('when successful should delete a reward item', done => {
+      chai
+        .request(app)
+        .delete('/rewards/' + rewardId)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Hadiah telah dihapus.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when a wrong rewardId is inputted', done => {
+      const updateQuery = {
+        title: 'Updated reward',
+        description: 'New reward my children can claim',
+        points: 6000
+      }
+
+      chai
+        .request(app)
+        .delete('/rewards/' + wrongRewardId)
+        .send(updateQuery)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(404)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Data tidak ditemukan.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when user is unauthorized to update', done => {
+      const updateQuery = {
+        title: 'Updated reward',
+        description: 'New reward my children can claim',
+        points: 6000
+      }
+
+      chai
+        .request(app)
+        .delete('/rewards/' + rewardId)
+        .set('access_token', currentAccessToken2)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.updatedReward).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+    })
+  })
+})
