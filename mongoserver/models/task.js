@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose')
+const { Schema, model, Types } = require('mongoose')
 
 const taskSchema = new Schema({
   title: {
@@ -20,6 +20,9 @@ const taskSchema = new Schema({
   familyId: {
     type: String,
     required: [true, 'familyID harus diisi.']
+  },
+  childId: {
+    type: Types.ObjectId
   },
   image: {
     type: String
