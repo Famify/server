@@ -38,6 +38,36 @@ class ChildController {
             .catch(next)
     }
 
+    static findAll(req, res, next) {
+        const familyId = req.loggedUser.familyId
+        Child.find({ familyId })
+            .then(children => {
+                res.status(200).json(children)
+            })
+            .catch(next)
+    }
+
+    static edit(req, res, next) {
+        const _id = req.params._id
+        Child.findByIdAndUpdate(_id, {
+            dateOfBirth: new Date(req.body.dateOfBirth),
+            avatar: req.body.avatar
+        }, {new: true})
+        .then(child => {
+            res.status(200).json(child)
+        })
+        .catch(next)
+    }
+
+    static delete(req, res, next) {
+        const _id = req.params._id
+        Child.findByIdAndDelete(_id)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(next)
+    }
+
 }
 
 module.exports = ChildController
