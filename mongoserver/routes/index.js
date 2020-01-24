@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const parentRouter = require('../routes/parentRouter')
-// const childrenRouter = require('../routes/childrenRouter')
+const childrenRouter = require('../routes/childrenRouter')
 
 router.get('/', function(req,res,next) {
     res.status(200).json({
@@ -10,6 +10,6 @@ router.get('/', function(req,res,next) {
 })
 
 router.use('/parents', parentRouter)
-// router.use('/children', childrenRouter)
+router.use('/children', childrenRouter)
 
 module.exports = router
