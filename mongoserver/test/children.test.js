@@ -240,7 +240,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas wajib diisi')
+                    expect(res.body.error[0]).to.equal('identitas wajib diisi')
                     done()
                 })
             })
@@ -255,7 +255,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('kata sandi wajib diisi')
+                    expect(res.body.error[0]).to.equal('kata sandi wajib diisi')
                     done()
                 })
             })
@@ -270,7 +270,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas atau kata sandi salah')
+                    expect(res.body.error[0]).to.equal('identitas atau kata sandi salah')
                     done()
                 })
             })
@@ -285,7 +285,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas atau kata sandi salah')
+                    expect(res.body.error[0]).to.equal('identitas atau kata sandi salah')
                     done()
                 })
             })

@@ -73,11 +73,6 @@ class TaskController {
           message: 'Tugas telah diklaim.'
         }
 
-        if (task.status === 'claimed') throw {
-          status: 403,
-          message: 'Tugas telah dituntaskan.'
-        }
-
         task.status = 'claimed'
         task.childId = req.loggedUser._id
         task.save()

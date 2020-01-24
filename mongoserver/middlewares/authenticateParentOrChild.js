@@ -25,11 +25,6 @@ module.exports = (req, res, next) => {
 
       child = childData
 
-      if (!parent && !child) throw {
-        status: 401,
-        message: 'Anda tidak memiliki akses.'
-      }
-
       if (parent) {
         req.loggedUser = {
           _id: parent._id,

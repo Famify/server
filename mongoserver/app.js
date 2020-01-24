@@ -1,6 +1,5 @@
-if (process.env.NODE_ENV){
-    require('dotenv').config()
-} 
+if (process.env.NODE_ENV) require('dotenv').config()
+
 
 //connect database
 require('./config/mongoose')
@@ -11,7 +10,6 @@ const cors = require('cors')
 const routes = require('./routes/index')
 const errorHandler = require('./middlewares/errorHandler')
 const PORT = process.env.NODE_ENV === 'testing' ? 4000 : 3000
-
 const app = express()
 
 app.use(cors())

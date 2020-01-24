@@ -17,10 +17,7 @@ const childSchema = new Schema({
     },
     familyId: {
         type: String,
-        required: [true, 'ID keluarga wajib diisi. Silakan tanyakan kepada orang tua'],
-        validate: [
-            {validator: isFamilyIdValid, message: 'ID keluarga tidak valid'}
-        ]
+        required: [true, 'ID keluarga wajib diisi. Silakan tanyakan kepada orang tua']
     },
     avatar: String,
     role: {
@@ -51,14 +48,6 @@ function isUsernameUnique(value) {
         else return true
       })
   }
-
-function isFamilyIdValid(value) {
-    return Parent.findOne({familyId: value})
-        .then(found => {
-            if (found) return true
-            else return false
-        })
-}
   
 //hashPassword
 childSchema.pre('save', function(next) {
