@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const ParentController = require('../controllers/parentController')
 const gcsUpload = require('gcs-upload')
+const authenticateParent = require('../middlewares/authenticateParent')
 
 const upload = gcsUpload({
     limits: {
@@ -15,5 +16,6 @@ const upload = gcsUpload({
 
 router.post('/signup', upload.single('avatar'), ParentController.register)
 router.post('/signin', ParentController.login)
+router.get('/', authenticateParent, ParentController.findAll)
 
 module.exports = router

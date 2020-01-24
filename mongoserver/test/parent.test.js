@@ -2,6 +2,8 @@
 // const chaiHttp = require('chai-http')
 // const app = require('../app')
 // const Parent = require('../models/parent')
+// let access_token, familyId
+// const invalidToken = 'shisdhsajhdkjnkdsja'
 
 // chai.use(chaiHttp)
 // const expect = chai.expect
@@ -35,11 +37,34 @@
 //                     expect(err).to.be.null
 //                     expect(res).to.have.status(201)
 //                     expect(res.body).to.be.an('object').to.have.any.keys('childrens', 'role', '_id', 'username', 'dateOfBirth', 'password', 'email', 'familyId', 'createdAt', 'updatedAt', '__v')
+//                     familyId = res.body.familyId
 //                     expect(res.body.childrens).to.be.an('array')
 //                     expect(res.body.role).to.equal('parent')
 //                     expect(res.body.username).to.equal('test')
 //                     expect(res.body.dateOfBirth).to.equal('1997-07-07T00:00:00.000Z')
 //                     expect(res.body.email).to.equal('test@mail.com')
+//                     done()
+//                 })
+//             }) 
+//             it('should send an object (newParent) with 201 status code', function(done) {
+//                 chai.request(app)
+//                 .post('/parents/signup')
+//                 .send({
+//                     username: 'testIbu',
+//                     password: '12345678',
+//                     email: 'testIbu@mail.com',
+//                     dateOfBirth: '1997-07-07',
+//                     familyId
+//                 })
+//                 .end(function(err, res) {
+//                     expect(err).to.be.null
+//                     expect(res).to.have.status(201)
+//                     expect(res.body).to.be.an('object').to.have.any.keys('childrens', 'role', '_id', 'username', 'dateOfBirth', 'password', 'email', 'familyId', 'createdAt', 'updatedAt', '__v')
+//                     expect(res.body.childrens).to.be.an('array')
+//                     expect(res.body.role).to.equal('parent')
+//                     expect(res.body.username).to.equal('testIbu')
+//                     expect(res.body.dateOfBirth).to.equal('1997-07-07T00:00:00.000Z')
+//                     expect(res.body.email).to.equal('testIbu@mail.com')
 //                     done()
 //                 })
 //             }) 
@@ -188,6 +213,7 @@
 //                     expect(err).to.be.null
 //                     expect(res).to.have.status(200)
 //                     expect(res.body).to.be.an('object').to.have.any.keys('token','parent')
+//                     access_token = res.body.token
 //                     expect(res.body.parent).to.be.an('object').to.have.any.keys('_id', 'username', 'email', 'dateOfBirth', 'childrens', 'familyId', 'role')
 //                     expect(res.body.parent.username).to.equal('test')
 //                     expect(res.body.parent.role).to.equal('parent')
@@ -270,6 +296,36 @@
 //                     expect(res).to.have.status(500)
 //                     expect(res.body.error).to.be.an('array')
 //                     expect(res.body.error[0].message).to.equal('identitas atau password salah')
+//                     done()
+//                 })
+//             })
+//         })
+//     })
+//     describe('GET /parents/', function() {
+//         describe('success process', function() {
+//             it('should send success response with status code 200', function(done) {
+//                 chai.request(app)
+//                 .get('/parents')
+//                 .set({ access_token })
+//                 .end(function(err, res) {
+//                     expect(err).to.be.null
+//                     expect(res).to.have.status(200)
+//                     expect(res.body).to.be.an('array')
+//                     expect(res.body[0]).to.be.an('object').to.have.any.keys('childrens', 'role', '_id', 'username', 'dateOfBirth', 'password', 'email', 'familyId', 'createdAt', 'updatedAt', '__v')
+//                     done()
+//                 })
+//             })
+//         })
+//         describe('error process', function() {
+//             it('should send error response with status code 401 because invalid access_token', function(done) {
+//                 chai.request(app)
+//                 .get('/parents')
+//                 .set({ access_token: invalidToken })
+//                 .end(function(err, res) {
+//                     expect(err).to.be.null
+//                     expect(res).to.have.status(401)
+//                     expect(res.body.error).to.be.an('array')
+//                     expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
 //                     done()
 //                 })
 //             })

@@ -4,8 +4,9 @@ const app = require('../app')
 const Parent = require('../models/parent')
 const Child = require('../models/child')
 const { generateToken } = require('../helpers/jwt')
-let currentAccessToken, familyId
+let currentAccessToken, familyId, _id
 let invalidToken = 'gawjhqgjwehwhbdnsad'
+let invalidId = 'sagjh18721873673'
 
 chai.use(chaiHttp)
 const expect = chai.expect
@@ -66,6 +67,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(201)
                     expect(res.body).to.be.an('object').to.have.any.keys('rewardsHistory', 'role', '_id', 'username', 'dateOfBirth', 'password', 'familyId', 'createdAt', 'updatedAt', '__v')
+                    _id = res.body._id
                     expect(res.body.rewardsHistory).to.be.an('array')
                     expect(res.body.role).to.equal('child')
                     expect(res.body.username).to.equal('anak1')
@@ -75,6 +77,7 @@ describe('Child Routes', function() {
                 })
             }) 
         })
+        
         describe('errors process', function() {
             it ('should send error with 401 status code because missing acces_token', function(done) {
                 chai.request(app)
@@ -288,4 +291,202 @@ describe('Child Routes', function() {
             })
         })
     })
+    describe('GET /children/', function() {
+        describe('success process', function() {
+            it ('should return an array of object with status code 200', function(done) {
+                chai.request(app)
+                .get('/children')
+                .set({ access_token: currentAccessToken})
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('array')
+                    expect(res.body[0]).to.be.an('object').to.have.any.keys('role', 'rewardsHistory', '_id', 'username', 'dateOfBirth', 'password', 'familyId', 'createdAt', 'updatedAt', '__v')
+                    done()
+                })
+            })
+        })
+        describe('error process', function() {
+            it ('should return 401 status code because invalid token', function(done) {
+                chai.request(app)
+                .get('/children')
+                .set({ access_token: invalidToken })
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+            it ('should return 401 status code because missing token value', function(done) {
+                chai.request(app)
+                .get('/children')
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+        })
+    })
+    describe('PATCH /children/:_id', function() {
+        describe('success process', function() {
+            it ('should return an object with status code 200', function(done) {
+                chai.request(app)
+                .patch(`/children/${_id}`)
+                .set({ access_token: currentAccessToken })
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object').to.have.any.keys('role','rewardsHistory','_id','username','dateOfBirth','password','familyId','createdAt','updatedAt','__v')
+                    expect(res.body.dateOfBirth).to.equal('2007-09-09T00:00:00.000Z')
+                    done()
+                })
+            })
+        })
+        describe('error process', function() {
+            it ('should return an error response with status code 401 because missing token value', function(done) {
+                chai.request(app)
+                .patch(`/children/${_id}`)
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 401 because invalid token value', function(done) {
+                chai.request(app)
+                .patch(`/children/${_id}`)
+                .set({ access_token: invalidToken })
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 400 because invalid Id', function(done) {
+                chai.request(app)
+                .patch(`/children/${invalidId}`)
+                .set({ access_token: currentAccessToken})
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(404)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Data tidak ditemukan.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 400 because missing parameter id', function(done) {
+                chai.request(app)
+                .patch(`/children/`)
+                .set({ access_token: currentAccessToken})
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(404)
+                    done()
+                })
+            })
+            it ('should return an error response with status code 400 because invalid date type', function(done) {
+                chai.request(app)
+                .patch(`/children/${_id}`)
+                .set({ access_token: currentAccessToken})
+                .send({
+                    dateOfBirth: 'not date'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(404)
+                    done()
+                })
+            })
+        })
+    })
+
+    describe('DELETE /children/:_id', function() {
+        describe('success process', function() {
+            it ('should return an object with status code 200', function(done) {
+                chai.request(app)
+                .delete(`/children/${_id}`)
+                .set({ access_token: currentAccessToken })
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(200)
+                    done()
+                })
+            })
+        })
+        describe('error process', function() {
+            it ('should return an error response with status code 401 because missing token value', function(done) {
+                chai.request(app)
+                .delete(`/children/${_id}`)
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 401 because invalid token value', function(done) {
+                chai.request(app)
+                .delete(`/children/${_id}`)
+                .set({ access_token: invalidToken })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(401)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 400 because invalid Id', function(done) {
+                chai.request(app)
+                .delete(`/children/${invalidId}`)
+                .set({ access_token: currentAccessToken})
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(404)
+                    expect(res.body.error).to.be.an('array')
+                    expect(res.body.error[0]).to.equal('Data tidak ditemukan.')
+                    done()
+                })
+            })
+            it ('should return an error response with status code 400 because missing parameter id', function(done) {
+                chai.request(app)
+                .patch(`/children/`)
+                .set({ access_token: currentAccessToken})
+                .send({
+                    dateOfBirth: '2007-09-09'
+                })
+                .end(function (err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(404)
+                    done()
+                })
+            })
+        })
+    })
+
 })
