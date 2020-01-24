@@ -17,8 +17,13 @@ class TaskController {
   }
 
   static fetchAll(req, res, next) {
+    let options = { familyId: req.loggedUser.familyId }
+    
+    const { status } = req.query
+    if (status) options.status = status
+
     Task
-      .find({ familyId: req.loggedUser._id })
+      .find(options)
       .then(allTasks => {
         res.status(200).json(allTasks)
       })
@@ -52,6 +57,55 @@ class TaskController {
       .then(updatedTask => {
         res.status(200).json({
           updatedTask, message: 'Berhasil memperbaharui tugas.'
+        })
+      })
+      .catch(next)
+  }
+
+  static claim(req, res, next) {
+    Task
+      .findOne(
+        { _id: req.params.id, familyId: req.loggedUser.familyId },
+      )
+      .then(task => {
+        if (task.status === 'claimed') throw {
+          status: 403,
+          message: 'Tugas telah diklaim.'
+        }
+
+        if (task.status === 'claimed') throw {
+          status: 403,
+          message: 'Tugas telah dituntaskan.'
+        }
+
+        task.status = 'claimed'
+        task.childId = req.loggedUser._id
+        task.save()
+
+        res.status(200).json({
+          claimedTask: task, message: 'Berhasil mengambil tugas.'
+        })
+      })
+      .catch(next)
+  }
+
+  static finish(req, res, next) {
+    Task
+      .findOne(
+        { _id: req.params.id, familyId: req.loggedUser.familyId },
+      )
+      .then(task => {
+        if (task.status === 'finished') throw {
+          status: 403,
+          message: 'Tugas telah diselesaikan.'
+        }
+
+        task.status = 'finished'
+        task.childId = req.loggedUser._id
+        task.save()
+
+        res.status(200).json({
+          finishedTask: task, message: 'Sukses mengubah status tugas menjadi selesai.'
         })
       })
       .catch(next)

@@ -10,7 +10,7 @@ const Task = require('../models/task')
 const expect = chai.expect
 chai.use(chaiHttp)
 
-let currentAccessToken, familyId, taskId, currentAccessToken2, familyId2, taskId2, currrentChildAccessToken, childFamilyId, childTaskId
+let currentAccessToken, familyId, taskId, currentAccessToken2, familyId2, taskId2, currrentChildAccessToken, childFamilyId, childTaskId, childId
 
 let wrongTaskId = '5e2a9096a8cbfc79123feed9'
 
@@ -74,6 +74,7 @@ describe('CRUD tasks', () => {
 
         currrentChildAccessToken = generateToken(payload)
         childFamilyId = child.familyId
+        childId = child._id
 
         return chai
           .request(app)
@@ -155,6 +156,129 @@ describe('CRUD tasks', () => {
 
           done()
         })
+    })
+  })
+
+  describe('GET /tasks?status=`unclaimed`', () => {
+    it('should return all tasks that have `unclaimed` status', done => {
+      chai
+        .request(app)
+        .post('/tasks')
+        .send({
+          title: 'Another task',
+          description: 'Initial task my children can work on to get points',
+          points: 5000,
+          deadline: '2020-02-20'
+        })
+        .set('access_token', currentAccessToken)
+        .then(_ => {
+          return chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/claim')
+            .set('access_token', currrentChildAccessToken)
+        })
+        .then(res => {
+          expect (res.body.claimedTask.status).to.eql('claimed')
+
+          return chai
+            .request(app)
+            .get('/tasks?status=unclaimed')
+            .set('access_token', currrentChildAccessToken)
+        })
+        .then(res => {
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+
+          res.body.forEach(obj => {
+            expect(obj.familyId === familyId)
+            expect(obj.status === 'unclaimed')
+          })
+
+          done()
+        })
+        .catch(err => console.log(err))
+    })
+  })
+
+  describe('GET /tasks?status=`claimed`', () => {
+    it('should return all tasks that have `claimed` status', done => {
+      chai
+        .request(app)
+        .post('/tasks')
+        .send({
+          title: 'Another task',
+          description: 'Initial task my children can work on to get points',
+          points: 5000,
+          deadline: '2020-02-20'
+        })
+        .set('access_token', currentAccessToken)
+        .then(_ => {
+          return chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/claim')
+            .set('access_token', currrentChildAccessToken)
+        })
+        .then(res => {
+          expect (res.body.claimedTask.status).to.eql('claimed')
+
+          return chai
+            .request(app)
+            .get('/tasks?status=unclaimed')
+            .set('access_token', currrentChildAccessToken)
+        })
+        .then(res => {
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+
+          res.body.forEach(obj => {
+            expect(obj.familyId === familyId)
+            expect(obj.status === 'claimed')
+          })
+
+          done()
+        })
+        .catch(err => console.log(err))
+    })
+  })
+
+  describe('GET /tasks?status=`finished`', () => {
+    it('should return all tasks that have `finished` status', done => {
+      chai
+        .request(app)
+        .post('/tasks')
+        .send({
+          title: 'Another task',
+          description: 'Initial task my children can work on to get points',
+          points: 5000,
+          deadline: '2020-02-20'
+        })
+        .set('access_token', currentAccessToken)
+        .then(_ => {
+          return chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/finish')
+            .set('access_token', currentAccessToken)
+        })
+        .then(res => {
+          expect (res.body.finishedTask.status).to.eql('finished')
+
+          return chai
+            .request(app)
+            .get('/tasks?status=finished')
+            .set('access_token', currentAccessToken)
+        })
+        .then(res => {
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+
+          res.body.forEach(obj => {
+            expect(obj.familyId === familyId)
+            expect(obj.status === 'finished')
+          })
+
+          done()
+        })
+        .catch(err => console.log(err))
     })
   })
 
@@ -451,8 +575,150 @@ describe('CRUD tasks', () => {
     })
   })
 
-  describe('PATCH /tasks/:id', () => {
-    
+  describe('PATCH /tasks/:id/claim', () => {
+    it('should add childId to task when successful', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/claim')
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Berhasil mengambil tugas.')
+
+          expect(res.body.claimedTask).to.be.an('object')
+          expect(res.body.claimedTask.status).to.eql('claimed')
+          expect(res.body.claimedTask.childId).to.eql(String(childId))
+
+          done()
+        })
+    })
+
+    it('should return an error when task is already claimed', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/claim')
+        .set('access_token', currrentChildAccessToken)
+        .then(_ =>
+          chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/claim')
+            .set('access_token', currrentChildAccessToken)
+        )
+        .then(res => {
+          expect(res).to.have.status(403)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.claimedTask).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Tugas telah diklaim.')
+
+          done()
+        })
+        .catch(err => console.log(err))
+    })
+
+    it('should return an error when parent tries to claim', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/claim')
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.claimedTask).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+    })
+  })
+
+  describe('PATCH /tasks/:id/finish', () => {
+    it('should return with success when having parental authorization', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/finish')
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Sukses mengubah status tugas menjadi selesai.')
+
+          expect(res.body.finishedTask).to.be.an('object')
+          expect(res.body.finishedTask.status).to.eql('finished')
+
+          done()
+        })
+    })
+
+    it('should return an error when task is already finished', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/finish')
+        .set('access_token', currentAccessToken)
+        .then(_ =>
+          chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/finish')
+            .set('access_token', currentAccessToken)
+        )
+        .then(res => {
+          expect(res).to.have.status(403)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.claimedTask).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Tugas telah diselesaikan.')
+
+          done()
+        })
+        .catch(err => console.log(err))
+    })
+
+    it('should return an error when a child tries to access it', done => {
+      chai
+        .request(app)
+        .patch('/tasks/' + taskId + '/finish')
+        .set('access_token', currrentChildAccessToken)
+        .then(_ =>
+          chai
+            .request(app)
+            .patch('/tasks/' + taskId + '/finish')
+            .set('access_token', currrentChildAccessToken)
+        )
+        .then(res => {
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.finishedTask).to.be.undefined
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+        .catch(err => console.log(err))
+    })
   })
 
   describe('DELETE /tasks/:id', () => {
