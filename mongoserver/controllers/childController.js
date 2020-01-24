@@ -17,15 +17,15 @@ class ChildController {
 
     static login(req, res, next) {
         if (!req.body.identity) throw { message: 'identitas wajib diisi'}
-        if (!req.body.password) throw { message: 'password wajib diisi'}
+        if (!req.body.password) throw { message: 'kata sandi wajib diisi'}
         
         Child.findOne({ username: req.body.identity})
             .then((child) => {
-                if (!child) throw {message: 'identitas atau password salah'}
+                if (!child) throw {message: 'identitas atau kata sandi salah'}
                 let passwordInput = req.body.password
                 let passwordDb = child.password
                 let isPassword = checkPassword(passwordInput, passwordDb)
-                if (!isPassword) throw {message: 'identitas atau password salah'}
+                if (!isPassword) throw {message: 'identitas atau kata sandi salah'}
                 let payload = {
                     _id: child._id,
                     username: child.username,
