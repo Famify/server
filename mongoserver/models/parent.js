@@ -1,4 +1,4 @@
-const { Schema, model, Types } = require('mongoose')
+const { Schema, model } = require('mongoose')
 const { hashPassword, checkPassword } = require('../helpers/bcrypt')
 const uuidv1 = require('uuid/v1')
 
@@ -9,6 +9,10 @@ const parentSchema = new Schema({
         validate: [
             {validator: isUsernameUnique, message: 'nama pengguna telah digunakan'}
         ]
+    },
+    DateOfBirth: {
+        type: Date,
+        required: [true, 'tanggal lahir wajib diisi']
     },
     email: {
         type: String,
@@ -30,7 +34,10 @@ const parentSchema = new Schema({
         return uuidv1()
     }},
     avatar: String,
-    role: String
+    role: {
+        type: String,
+        default: 'parent'
+    }
 }, {
     timestamps: true
 })

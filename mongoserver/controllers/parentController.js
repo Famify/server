@@ -5,8 +5,8 @@ const { generateToken, verifyToken } = require('../helpers/jwt')
 class ParentController {
 
     static register(req, res, next) {
-        const { username, password, email, avatar } = req.body
-        Parent.create({ username, password, email, avatar}) 
+        const { username, dateOfBirth, password, email, avatar } = req.body
+        Parent.create({ username, dateOfBirth, password, email, avatar}) 
                 .then((newParent) => {
                     res.status(201).json(newParent)
                 })
