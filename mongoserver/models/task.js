@@ -13,15 +13,19 @@ const taskSchema = new Schema({
     required: [true, 'Mohon masukkan poin yang akan didapatkan ketika menyelesaikan tugas ini.']
   },
   status: {
-    type: Boolean,
-    default: true
+    type: String,
+    enum: ['unclaimed', 'claimed', 'finished'],
+    default: 'unclaimed'
   },
-  familyID: {
+  familyId: {
     type: String,
     required: [true, 'familyID harus diisi.']
   },
   image: {
     type: String
+  },
+  deadline: {
+    type: Date
   }
 })
 

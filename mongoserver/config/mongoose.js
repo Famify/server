@@ -17,7 +17,6 @@ const mongoConfig = {
 }
 
 mongoose.connect(mongoUri, mongoConfig, function(err) {
-    if (err) console.log('db disconnected');
-    else console.log('db connected');
-    
+    if (err) console.log('db disconnected')
+    else console.log('db connected')
 })
