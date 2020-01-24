@@ -5,15 +5,15 @@ const Parent = require('./parent')
 const childSchema = new Schema({
     username: {
         type: String,
-        required: [true, 'nama pengguna wajib diisi'],
+        required: [true, 'nama anak wajib diisi'],
         validate: [
-            {validator: isUsernameUnique, message: 'nama pengguna telah digunakan'}
+            {validator: isUsernameUnique, message: 'nama anak telah digunakan'}
         ]
     },
     password: {
         type: String,
-        required: [true, 'password wajib diisi'],
-        minlength: [8, 'password minimal 8 karakter']
+        required: [true, 'kata sandi wajib diisi'],
+        minlength: [8, 'kata sandi minimal 8 karakter']
     },
     familyId: {
         type: String,
@@ -31,10 +31,10 @@ const childSchema = new Schema({
         type: Date,
         required: [true, 'tanggal lahir wajib diisi']
     },
-    Point: {
+    point: {
         type: Number
     },
-    RewardsHistory: [{
+    rewardsHistory: [{
         type: Schema.Types.ObjectId
     }],
     avatar: {
@@ -45,7 +45,7 @@ const childSchema = new Schema({
 })
 
 function isUsernameUnique(value) {
-    return Child.findOne({ name: value })
+    return Child.findOne({ username: value })
       .then(found => {
         if (found) return false
         else return true
