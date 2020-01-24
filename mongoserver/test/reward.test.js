@@ -46,13 +46,13 @@ describe.only('CRUD rewards', () => {
       .catch(err => console.log(err))
   })
 
-  // describe('GET /rewards', () => {
+  describe('GET /rewards', () => {
 
-  // })
+  })
 
-  // describe('GET /rewards/:id', () => {
-
-  // })
+  describe('GET /rewards/:id', () => {
+    it('should return ')
+  })
 
   describe('POST /rewards', () => {
     it('should return a success message when all required fields are filled', done => {
@@ -78,7 +78,7 @@ describe.only('CRUD rewards', () => {
         })
     })
 
-    it('should return an error message when no title is inputted', done => {
+    it('should return an error when no title is inputted', done => {
       chai
         .request(app)
         .post('/rewards')
@@ -103,7 +103,7 @@ describe.only('CRUD rewards', () => {
         })
     })
 
-    it('should return an error message when points field is empty', done => {
+    it('should return an error when points field is empty', done => {
       chai
         .request(app)
         .post('/rewards')
@@ -128,7 +128,7 @@ describe.only('CRUD rewards', () => {
         })
     })
 
-    it.only('should return an error message when user has not logged in', done => {
+    it('should return an error when user has not logged in', done => {
       chai
         .request(app)
         .post('/rewards')
@@ -138,7 +138,6 @@ describe.only('CRUD rewards', () => {
           points: 1000
         })
         .end((err, res) => {
-          console.log('ini res body', res.body)
 
           expect(err).to.be.null
           expect(res).to.have.status(401)

@@ -15,6 +15,15 @@ class RewardController {
       })
       .catch(next)
   }
+
+  static fetchAll(req, res, next) {
+    Reward
+      .find()
+      .then(allRewards => {
+        res.status(200).json(allRewards)
+      })
+      .catch(next)
+  }
 }
 
 module.exports = RewardController
