@@ -11,17 +11,16 @@ chai.use(chaiHttp)
 let currentAccessToken = ''
 let familyId = ''
 
-describe('CRUD reward', () => {
-  beforeEach(done => {
-    console.log('masuk before');
+describe.only('CRUD reward', () => {
 
-
-    Parent.create({
-      username: 'initial',
-      email: 'initial@mail.com',
-      password: 'initial',
-      role: 'parent'
-    })
+  beforeEach((done) => {
+    Parent
+      .create({
+        username: 'initial',
+        email: 'initial@mail.com',
+        password: 'initial123',
+        role: 'parent'
+      })
       .then(parent => {
         const payload = {
           _id: parent._id,
@@ -32,30 +31,40 @@ describe('CRUD reward', () => {
         }
         currentAccessToken = generateToken(payload)
         familyId = parent.familyId
-        console.log('ACCESS', currentAccessToken)
 
+        console.log('ini familyId', familyId)
+        
         done()
       })
       .catch(err => console.log(err))
   })
 
   afterEach(done => {
-
+    Parent
+      .deleteMany()
+      .then(() => {
+        console.log('Deleted all users.')
+        done()
+      })
+      .catch(err => console.log(err))
   })
 
-  describe('GET /rewards', () => {
+  // describe('GET /rewards', () => {
 
-  })
+  // })
 
-  describe('GET /rewards/:id', () => {
+  // describe('GET /rewards/:id', () => {
 
-  })
+  // })
 
   describe('POST /rewards', () => {
     it('should return a success message', done => {
+      console.log('ini familyId di bawah', familyId)
+      
       chai
         .request(app)
-        .post({
+        .post('/rewards')
+        .send({
           title: 'Reward',
           description: 'Reward my children can claim',
           points: 1000,
@@ -63,6 +72,8 @@ describe('CRUD reward', () => {
         })
         // .set()
         .end((err, res) => {
+          console.log('ini res body', res.body);
+          
           expect(err).to.be.null
           expect(res).to.have.status(201)
           done()
@@ -71,15 +82,15 @@ describe('CRUD reward', () => {
 
   })
 
-  describe('PUT /rewards/:id', () => {
+  // describe('PUT /rewards/:id', () => {
 
-  })
+  // })
 
-  describe('PATCH /rewards/:id', () => {
+  // describe('PATCH /rewards/:id', () => {
 
-  })
+  // })
 
-  describe('DELETE /rewards/:id', () => {
+  // describe('DELETE /rewards/:id', () => {
 
-  })
+  // })
 })
