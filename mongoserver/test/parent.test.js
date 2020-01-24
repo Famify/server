@@ -250,7 +250,7 @@ describe('Parent Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas wajib diisi')
+                    expect(res.body.error[0]).to.equal('identitas wajib diisi')
                     done()
                 })
             })
@@ -265,7 +265,7 @@ describe('Parent Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('kata sandi wajib diisi')
+                    expect(res.body.error[0]).to.equal('kata sandi wajib diisi')
                     done()
                 })
             })
@@ -280,7 +280,7 @@ describe('Parent Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas atau password salah')
+                    expect(res.body.error[0]).to.equal('identitas atau password salah')
                     done()
                 })
             })
@@ -295,7 +295,7 @@ describe('Parent Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(500)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0].message).to.equal('identitas atau password salah')
+                    expect(res.body.error[0]).to.equal('identitas atau password salah')
                     done()
                 })
             })

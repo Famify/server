@@ -460,8 +460,7 @@ describe('CRUD rewards', () => {
         .end((err, res) => {
           expect(err).to.be.null
           expect(res).to.have.status(200)
-          expect(res.body).to.be.an('object').to.have.keys('status', '_id', 'title', 'description', 'points', 'familyId', '__v')
-          expect(res.body.status).to.equal(false)
+          expect(res.body).to.be.an('object').to.have.keys('createdAt', 'updatedAt', 'password', 'role', 'username', '_id', 'dateOfBirth', 'point', 'rewardsHistory', 'familyId', '__v')
           done()
         })
     })
@@ -473,7 +472,7 @@ describe('CRUD rewards', () => {
         .end((err, res) => {
           expect(err).to.be.null
           expect(res).to.have.status(404)
-          expect(res.error.text).to.equal('{"error":["Data tidak ditemukan."]}')
+          expect(res.body.error[0]).to.equal('Data tidak ditemukan.')
           done()
         })
     })
@@ -484,9 +483,32 @@ describe('CRUD rewards', () => {
         .set('access_token', '12ytu1gewhehjwqjh')
         .end((err, res) => {
           expect(err).to.be.null
-          console.log(res.error , 'ini error2')
           expect(res).to.have.status(401)
-          expect(res.error.text).to.equal('{"error":["Mohon sign in terlebih dahulu."]}')
+          expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
+          done()
+        })
+    })
+    it('should return an error message when a parent token is inputted', done => {
+      chai
+        .request(app)
+        .patch('/rewards/' + wrongRewardId)
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+          expect(res.body.error[0]).to.equal('Anda tidak memiliki akses.')
+          done()
+        })
+    })
+    it('should return an error message when point is not enough', done => {
+      chai
+        .request(app)
+        .patch('/rewards/' + rewardId)
+        .set('access_token', tokenChild2)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(500)
+          expect(res.body.error[0]).to.equal('Poin tidak mencukupi.')
           done()
         })
     })

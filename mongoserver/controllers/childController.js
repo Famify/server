@@ -39,7 +39,7 @@ class ChildController {
     }
 
     static findAll(req, res, next) {
-        const familyId = req.loggedUser.familyId
+        const familyId = req.body.familyId || req.loggedUser.familyId
         Child.find({ familyId })
             .then(children => {
                 res.status(200).json(children)

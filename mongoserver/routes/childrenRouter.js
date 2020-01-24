@@ -9,8 +9,7 @@ const upload = gcsUpload({
     },
     gcsConfig: {
       keyFilename: process.env.GOOGLE_CLOUD_KEYFILE,  // this can also be set using GOOGLE_APPLICATION_CREDENTIALS environment variable 
-      bucketName: process.env.CLOUD_BUCKET,
-      prefix: () => `${Date.now()}-` // optional, this is it's default value
+      bucketName: process.env.CLOUD_BUCKET
     }
   })
 

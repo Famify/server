@@ -80,7 +80,10 @@ class RewardController {
         }, {new: true})
       })
       .then (reward => {
-        res.status(200).json(reward)
+        return Child.findByIdAndUpdate(req.loggedUser._id, { $push: { rewardsHistory: reward } }, { new: true })
+      })
+      .then (child => {
+        res.status(200).json(child)
       })
       .catch(next)
   }
