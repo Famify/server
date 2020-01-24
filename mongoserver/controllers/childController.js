@@ -5,9 +5,9 @@ const { generateToken, verifyToken } = require('../helpers/jwt')
 class ChildController {
 
     static register(req, res, next) {
-        const { username, familyId, password, avatar } = req.body
+        const { username, password, avatar } = req.body
+        const familyId = req.loggedUser.familyId
         const dateOfBirth = new Date(req.body.dateOfBirth)
-        console.log(dateOfBirth instanceof Date)
         Child.create({ username, dateOfBirth, password, familyId, avatar}) 
                 .then((newChild) => {
                     res.status(201).json(newChild)

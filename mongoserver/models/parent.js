@@ -5,12 +5,12 @@ const uuidv1 = require('uuid/v1')
 const parentSchema = new Schema({
     username: {
         type: String,
-        required: [true, ''],
+        required: [true, 'nama pengguna wajib diisi'],
         validate: [
             {validator: isUsernameUnique, message: 'nama pengguna telah digunakan'}
         ]
     },
-    DateOfBirth: {
+    dateOfBirth: {
         type: Date,
         required: [true, 'tanggal lahir wajib diisi']
     },
@@ -24,8 +24,8 @@ const parentSchema = new Schema({
     },
     password: {
         type: String,
-        required: [true, 'password wajib diisi'],
-        minlength: [8, 'password minimal 8 karakter']
+        required: [true, 'kata sandi wajib diisi'],
+        minlength: [8, 'kata sandi minimal 8 karakter']
     },
     childrens: [{
         type: Schema.Types.ObjectId
@@ -52,7 +52,7 @@ function isEmailUnique(value) {
   }
 
 function isUsernameUnique(value) {
-    return Parent.findOne({ name: value })
+    return Parent.findOne({ username: value })
       .then(found => {
         if (found) return false
         else return true
