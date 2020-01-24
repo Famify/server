@@ -4,12 +4,13 @@ const app = require('../app')
 const { generateToken } = require('../helpers/jwt')
 
 const Parent = require('../models/parent')
+const Child = require('../models/child')
 const Task = require('../models/task')
 
 const expect = chai.expect
 chai.use(chaiHttp)
 
-let currentAccessToken, familyId, taskId, currentAccessToken2, familyId2, taskId2
+let currentAccessToken, familyId, taskId, currentAccessToken2, familyId2, taskId2, currrentChildAccessToken, childFamilyId, childTaskId
 
 let wrongTaskId = '5e2a9096a8cbfc79123feed9'
 
@@ -29,7 +30,6 @@ describe('CRUD tasks', () => {
           _id: parent._id,
           username: parent.username,
           email: parent.email,
-          role: parent.role,
           familyId: parent.familyId
         }
         currentAccessToken = generateToken(payload)
@@ -40,7 +40,6 @@ describe('CRUD tasks', () => {
             username: 'initial2',
             email: 'initial2@mail.com',
             password: 'initial2-123',
-            role: 'parent',
             dateOfBirth: new Date()
           })
       })
@@ -52,37 +51,58 @@ describe('CRUD tasks', () => {
           role: parent.role,
           familyId: parent.familyId
         }
+
         currentAccessToken2 = generateToken(payload)
         familyId2 = parent.familyId
 
-        chai
+        return Child
+          .create({
+            username: 'initial-child',
+            password: 'initial-child',
+            familyId,
+            dateOfBirth: new Date()
+          })
+      })
+      .then(child => {
+        const payload = {
+          _id: child._id,
+          username: child.username,
+          email: child.email,
+          role: child.role,
+          familyId: child.familyId
+        }
+
+        currrentChildAccessToken = generateToken(payload)
+        childFamilyId = child.familyId
+
+        return chai
           .request(app)
           .post('/tasks')
           .send({
             title: 'Initial task',
             description: 'Initial task my children can work on to get points',
-            points: 5000
+            points: 5000,
+            deadline: '2020-02-20'
           })
           .set('access_token', currentAccessToken)
-          .end((err, res) => {
-            console.log('ini res body POST /tasks', res.body)
-            
-            taskId = res.body.newTask._id
+      })
+      .then(res => {
+        taskId = res.body.newTask._id
 
-            chai
-              .request(app)
-              .post('/tasks')
-              .send({
-                title: 'Second initial task',
-                description: 'Second initial task my children can work on to get points',
-                points: 7000
-              })
-              .set('access_token', currentAccessToken2)
-              .end((err, res) => {
-                taskId2 = res.body.newTask._id
-                done()
-              })
+        return chai
+          .request(app)
+          .post('/tasks')
+          .send({
+            title: 'Second initial task',
+            description: 'Second initial task my children can work on to get points',
+            points: 7000,
+            deadline: '2020-02-20'
           })
+          .set('access_token', currentAccessToken2)
+      })
+      .then(res => {
+        taskId2 = res.body.newTask._id
+        done()
       })
       .catch(err => console.log(err))
   })
@@ -90,13 +110,16 @@ describe('CRUD tasks', () => {
   afterEach(done => {
     Parent
       .deleteMany()
-      .then(() => Task.deleteMany())
+      .then(() => {
+        Task.deleteMany()
+        return Child.deleteMany()
+      })
       .then(() => done())
       .catch(err => console.log(err))
   })
 
   describe('GET /tasks', () => {
-    it.only('should return all existing tasks that have user`s familyId', done => {
+    it('should return all existing tasks that have user`s familyId', done => {
       chai
         .request(app)
         .get('/tasks')
@@ -114,29 +137,64 @@ describe('CRUD tasks', () => {
           done()
         })
     })
-  })
 
-  describe('GET /rewards/:id', () => {
-    it('should return a reward with the same id as param', done => {
+    it('should also be accessible by user with role child', done => {
       chai
         .request(app)
-        .get('/rewards/' + rewardId)
+        .get('/tasks')
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('array')
+
+          res.body.forEach(obj => {
+            expect(obj.familyId === familyId)
+          })
+
+          done()
+        })
+    })
+  })
+
+  describe('GET /tasks/:id', () => {
+    it('should return a task with the same id as param', done => {
+      chai
+        .request(app)
+        .get('/tasks/' + taskId)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
           expect(err).to.be.null
           expect(res).to.have.status(200)
 
           expect(res.body).to.be.an('object')
-          expect(res.body._id).to.eql(rewardId)
+          expect(res.body._id).to.eql(taskId)
 
           done()
         })
     })
 
-    it('should return an error message when the rewardId is not found in the database', done => {
+    it('should also be accessible by user with role child', done => {
       chai
         .request(app)
-        .get('/rewards/' + wrongRewardId)
+        .get('/tasks/' + taskId)
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body._id).to.eql(taskId)
+
+          done()
+        })
+    })
+
+    it('should return an error message when the taskId is not found in the database', done => {
+      chai
+        .request(app)
+        .get('/tasks/' + wrongTaskId)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
           expect(err).to.be.null
@@ -152,15 +210,16 @@ describe('CRUD tasks', () => {
     })
   })
 
-  describe('POST /rewards', () => {
+  describe('POST /tasks', () => {
     it('should return a success message when all required fields are filled', done => {
       chai
         .request(app)
-        .post('/rewards')
+        .post('/tasks')
         .send({
-          title: 'Reward',
-          description: 'Reward my children can claim',
-          points: 1000
+          title: 'Task',
+          description: 'Task my children can work on',
+          points: 1000,
+          deadline: '2020-02-20'
         })
         .set('access_token', currentAccessToken)
         .end((err, res) => {
@@ -170,7 +229,33 @@ describe('CRUD tasks', () => {
 
           expect(res.body).to.be.an('object')
           expect(res.body.message).to.be.a('string')
-          expect(res.body.message).to.eql('Berhasil menambahkan hadiah baru.')
+          expect(res.body.message).to.eql('Berhasil menambahkan tugas baru.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when a child tries to add tasks', done => {
+      chai
+        .request(app)
+        .post('/tasks')
+        .send({
+          title: 'Task',
+          description: 'Task for me',
+          points: 1000,
+          deadline: '2020-02-20'
+        })
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
 
           done()
         })
@@ -179,7 +264,7 @@ describe('CRUD tasks', () => {
     it('should return an error when no title is inputted', done => {
       chai
         .request(app)
-        .post('/rewards')
+        .post('/tasks')
         .send({
           title: '',
           description: 'Reward my children can claim',
@@ -195,7 +280,7 @@ describe('CRUD tasks', () => {
           expect(res.body.message).to.be.undefined
 
           expect(res.body.error).to.be.an('array')
-          expect(res.body.error[0]).to.eql('Mohon masukkan nama hadiah.')
+          expect(res.body.error[0]).to.eql('Mohon masukkan judul tugas.')
 
           done()
         })
@@ -204,7 +289,7 @@ describe('CRUD tasks', () => {
     it('should return an error when points field is empty', done => {
       chai
         .request(app)
-        .post('/rewards')
+        .post('/tasks')
         .send({
           title: 'Reward',
           description: 'Reward my children can claim',
@@ -220,7 +305,7 @@ describe('CRUD tasks', () => {
           expect(res.body.message).to.be.undefined
 
           expect(res.body.error).to.be.an('array')
-          expect(res.body.error[0]).to.eql('Mohon masukkan poin yang perlu ditukarkan untuk mengklaim hadiah ini.')
+          expect(res.body.error[0]).to.eql('Mohon masukkan poin yang akan didapatkan ketika menyelesaikan tugas ini.')
 
           done()
         })
@@ -229,7 +314,7 @@ describe('CRUD tasks', () => {
     it('should return an error when user has not signed in', done => {
       chai
         .request(app)
-        .post('/rewards')
+        .post('/tasks')
         .send({
           title: 'Reward',
           description: 'Reward my children can claim',
@@ -251,18 +336,17 @@ describe('CRUD tasks', () => {
     })
   })
 
-  describe('PUT /rewards/:id', () => {
-    it('when successful should update a reward item', done => {
-
+  describe('PUT /tasks/:id', () => {
+    it('when successful should update a task item', done => {
       const updateQuery = {
-        title: 'Updated reward',
-        description: 'New reward my children can claim',
+        title: 'Updated task',
+        description: 'New task my children can work on',
         points: 6000
       }
 
       chai
         .request(app)
-        .put('/rewards/' + rewardId)
+        .put('/tasks/' + taskId)
         .send(updateQuery)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
@@ -271,28 +355,55 @@ describe('CRUD tasks', () => {
 
           expect(res.body).to.be.an('object')
           expect(res.body.message).to.be.a('string')
-          expect(res.body.message).to.eql('Berhasil memperbaharui hadiah.')
+          expect(res.body.message).to.eql('Berhasil memperbaharui tugas.')
 
-          expect(res.body.updatedReward).to.be.an('object')
-          expect(res.body.updatedReward.title).to.eql(updateQuery.title)
-          expect(res.body.updatedReward.description)
+          expect(res.body.updatedTask).to.be.an('object')
+          expect(res.body.updatedTask.title).to.eql(updateQuery.title)
+          expect(res.body.updatedTask.description)
             .to.eql(updateQuery.description)
-          expect(res.body.updatedReward.points).to.eql(updateQuery.points)
+          expect(res.body.updatedTask.points).to.eql(updateQuery.points)
 
           done()
         })
     })
 
-    it('should return an error message when a wrong rewardId is inputted', done => {
+    it('should return an error message when a child tries to update tasks', done => {
       const updateQuery = {
-        title: 'Updated reward',
-        description: 'New reward my children can claim',
+        title: 'Updated task',
+        description: 'New task for me',
         points: 6000
       }
 
       chai
         .request(app)
-        .put('/rewards/' + wrongRewardId)
+        .put('/tasks/' + taskId)
+        .send(updateQuery)
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when a wrong taskId is inputted', done => {
+      const updateQuery = {
+        title: 'Updated task',
+        description: 'New task my children can claim',
+        points: 6000
+      }
+
+      chai
+        .request(app)
+        .put('/tasks/' + wrongTaskId)
         .send(updateQuery)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
@@ -303,7 +414,7 @@ describe('CRUD tasks', () => {
           expect(res.body).to.be.an('object')
           expect(res.body.message).to.be.undefined
 
-          expect(res.body.updatedReward).to.be.undefined
+          expect(res.body.updatedTask).to.be.undefined
           expect(res.body.error).to.be.an('array')
           expect(res.body.error[0]).to.eql('Data tidak ditemukan.')
 
@@ -313,14 +424,14 @@ describe('CRUD tasks', () => {
 
     it('should return an error message when user is unauthorized to update', done => {
       const updateQuery = {
-        title: 'Updated reward',
-        description: 'New reward my children can claim',
+        title: 'Updated task',
+        description: 'New task my children can claim',
         points: 6000
       }
 
       chai
         .request(app)
-        .put('/rewards/' + rewardId)
+        .put('/tasks/' + taskId)
         .send(updateQuery)
         .set('access_token', currentAccessToken2)
         .end((err, res) => {
@@ -331,7 +442,7 @@ describe('CRUD tasks', () => {
           expect(res.body).to.be.an('object')
           expect(res.body.message).to.be.undefined
 
-          expect(res.body.updatedReward).to.be.undefined
+          expect(res.body.updatedTask).to.be.undefined
           expect(res.body.error).to.be.an('array')
           expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
 
@@ -340,11 +451,15 @@ describe('CRUD tasks', () => {
     })
   })
 
-  describe('DELETE /rewards/:id', () => {
-    it('when successful should delete a reward item', done => {
+  describe('PATCH /tasks/:id', () => {
+    
+  })
+
+  describe('DELETE /tasks/:id', () => {
+    it('when successful should delete a task item', done => {
       chai
         .request(app)
-        .delete('/rewards/' + rewardId)
+        .delete('/tasks/' + taskId)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
           expect(err).to.be.null
@@ -352,23 +467,36 @@ describe('CRUD tasks', () => {
 
           expect(res.body).to.be.an('object')
           expect(res.body.message).to.be.a('string')
-          expect(res.body.message).to.eql('Hadiah telah dihapus.')
+          expect(res.body.message).to.eql('Tugas telah dihapus.')
 
           done()
         })
     })
 
-    it('should return an error message when a wrong rewardId is inputted', done => {
-      const updateQuery = {
-        title: 'Updated reward',
-        description: 'New reward my children can claim',
-        points: 6000
-      }
-
+    it('should return an error message when a child tries to delete tasks', done => {
       chai
         .request(app)
-        .delete('/rewards/' + wrongRewardId)
-        .send(updateQuery)
+        .delete('/tasks/' + taskId)
+        .set('access_token', currrentChildAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Anda tidak memiliki akses.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when a wrong taskId is inputted', done => {
+      chai
+        .request(app)
+        .delete('/tasks/' + wrongTaskId)
         .set('access_token', currentAccessToken)
         .end((err, res) => {
 
@@ -385,16 +513,10 @@ describe('CRUD tasks', () => {
         })
     })
 
-    it('should return an error message when user is unauthorized to update', done => {
-      const updateQuery = {
-        title: 'Updated reward',
-        description: 'New reward my children can claim',
-        points: 6000
-      }
-
+    it('should return an error message when user is unauthorized to delete', done => {
       chai
         .request(app)
-        .delete('/rewards/' + rewardId)
+        .delete('/tasks/' + taskId)
         .set('access_token', currentAccessToken2)
         .end((err, res) => {
 
