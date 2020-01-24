@@ -3,9 +3,11 @@ const Reward = require('../models/reward')
 class RewardController {
 
   static add(req, res, next) {
-    const { title, description, points, familyID, image } = req.body
+    const { title, description, points, image } = req.body
     Reward
-      .create({ title, description, points, familyID, image })
+      .create({
+        title, description, points, familyId: req.loggedUser.familyId, image
+      })
       .then(newReward => {
         res.status(201).json(newReward)
       })

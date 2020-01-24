@@ -31,9 +31,6 @@ describe.only('CRUD reward', () => {
         }
         currentAccessToken = generateToken(payload)
         familyId = parent.familyId
-
-        console.log('ini familyId', familyId)
-        
         done()
       })
       .catch(err => console.log(err))
@@ -59,21 +56,16 @@ describe.only('CRUD reward', () => {
 
   describe('POST /rewards', () => {
     it('should return a success message', done => {
-      console.log('ini familyId di bawah', familyId)
-      
       chai
         .request(app)
         .post('/rewards')
         .send({
           title: 'Reward',
           description: 'Reward my children can claim',
-          points: 1000,
-          familyId,
+          points: 1000
         })
-        // .set()
+        .set('access_token', currentAccessToken)
         .end((err, res) => {
-          console.log('ini res body', res.body);
-          
           expect(err).to.be.null
           expect(res).to.have.status(201)
           done()
