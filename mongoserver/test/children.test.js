@@ -90,7 +90,7 @@ describe('Child Routes', function() {
                 .end(function(err, res) {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
-                    expect(res.body.error).to.be.an('array').that.includes('Mohon log in terlebih dahulu.')
+                    expect(res.body.error).to.be.an('array').that.includes('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -106,7 +106,7 @@ describe('Child Routes', function() {
                 .end(function(err, res) {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
-                    expect(res.body.error).to.be.an('array').that.includes('Mohon log in terlebih dahulu.')
+                    expect(res.body.error).to.be.an('array').that.includes('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -315,7 +315,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -326,7 +326,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -361,7 +361,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -376,7 +376,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -445,7 +445,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
@@ -457,7 +457,7 @@ describe('Child Routes', function() {
                     expect(err).to.be.null
                     expect(res).to.have.status(401)
                     expect(res.body.error).to.be.an('array')
-                    expect(res.body.error[0]).to.equal('Mohon log in terlebih dahulu.')
+                    expect(res.body.error[0]).to.equal('Mohon sign in terlebih dahulu.')
                     done()
                 })
             })
