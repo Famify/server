@@ -11,7 +11,7 @@ chai.use(chaiHttp)
 let currentAccessToken = ''
 let familyId = ''
 
-describe.only('CRUD reward', () => {
+describe.only('CRUD rewards', () => {
 
   beforeEach((done) => {
     Parent
@@ -40,7 +40,7 @@ describe.only('CRUD reward', () => {
     Parent
       .deleteMany()
       .then(() => {
-        console.log('Deleted all users.')
+        // console.log('Deleted all users.')
         done()
       })
       .catch(err => console.log(err))
@@ -55,7 +55,7 @@ describe.only('CRUD reward', () => {
   // })
 
   describe('POST /rewards', () => {
-    it('should return a success message', done => {
+    it('should return a success message when all required fields are filled', done => {
       chai
         .request(app)
         .post('/rewards')
@@ -66,12 +66,92 @@ describe.only('CRUD reward', () => {
         })
         .set('access_token', currentAccessToken)
         .end((err, res) => {
+
           expect(err).to.be.null
           expect(res).to.have.status(201)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.a('string')
+          expect(res.body.message).to.eql('Berhasil menambahkan hadiah baru.')
+
           done()
         })
     })
 
+    it('should return an error message when no title is inputted', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: '',
+          description: 'Reward my children can claim',
+          points: 1000
+        })
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(400)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon masukkan nama hadiah.')
+
+          done()
+        })
+    })
+
+    it('should return an error message when points field is empty', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: 'Reward',
+          description: 'Reward my children can claim',
+          points: ''
+        })
+        .set('access_token', currentAccessToken)
+        .end((err, res) => {
+
+          expect(err).to.be.null
+          expect(res).to.have.status(400)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon masukkan poin yang perlu ditukarkan untuk mengklaim hadiah ini.')
+
+          done()
+        })
+    })
+
+    it.only('should return an error message when user has not logged in', done => {
+      chai
+        .request(app)
+        .post('/rewards')
+        .send({
+          title: 'Reward',
+          description: 'Reward my children can claim',
+          points: 1000
+        })
+        .end((err, res) => {
+          console.log('ini res body', res.body)
+
+          expect(err).to.be.null
+          expect(res).to.have.status(401)
+
+          expect(res.body).to.be.an('object')
+          expect(res.body.message).to.be.undefined
+
+          expect(res.body.error).to.be.an('array')
+          expect(res.body.error[0]).to.eql('Mohon log in terlebih dahulu.')
+
+          done()
+        })
+    })
   })
 
   // describe('PUT /rewards/:id', () => {

@@ -15,7 +15,7 @@ const PORT = process.env.NODE_ENV === 'testing' ? 4000 : 3000
 const app = express()
 
 app.use(cors())
-app.use(morgan('dev'))
+// app.use(morgan('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 

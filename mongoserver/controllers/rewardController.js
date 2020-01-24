@@ -9,7 +9,9 @@ class RewardController {
         title, description, points, familyId: req.loggedUser.familyId, image
       })
       .then(newReward => {
-        res.status(201).json(newReward)
+        res.status(201).json(
+          { newReward, message: 'Berhasil menambahkan hadiah baru.' }
+        )
       })
       .catch(next)
   }
