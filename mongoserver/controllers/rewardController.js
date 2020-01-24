@@ -27,10 +27,40 @@ class RewardController {
 
   static fetchOne(req, res, next) {
     Reward
-      .find({ _id: req.params.id, familyId: req.loggedUser.familyId })
+      .findOne({ _id: req.params.id, familyId: req.loggedUser.familyId })
       .then(reward => {
-        res.status(200).json(reward[0])
+
+        if (!reward) throw {
+          status: 404,
+          message: 'Data tidak ditemukan.'
+        }
+
+        res.status(200).json(reward)
       })
+      .catch(next)
+  }
+
+  static update(req, res, next) {
+    const { title, description, points, status, image } = req.body
+
+    Reward
+      .findOneAndUpdate(
+        { _id: req.params.id, familyId: req.loggedUser.familyId },
+        { title, description, points, status, image },
+        { new: true, omitUndefined: true }
+      )
+      .then(updatedReward => {
+        res.status(200).json({
+          updatedReward, message: 'Berhasil memperbaharui hadiah.'
+        })
+      })
+      .catch(next)
+  }
+
+  static delete(req, res, next) {
+    Reward
+      .findByIdAndDelete(req.params.id)
+      .then(_ => res.status(200).json({ message: 'Hadiah telah dihapus.' }))
       .catch(next)
   }
 }
