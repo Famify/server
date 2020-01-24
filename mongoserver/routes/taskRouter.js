@@ -6,14 +6,14 @@ const authenticateParent = require('../middlewares/authenticateParent')
 const authenticateParentOrChild = require('../middlewares/authenticateParentOrChild')
 const authorizeParent = require('../middlewares/authorizeParentTask')
 
-router.put('/:id', authenticateParent, authorizeParent, TaskController.update)
-router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete)
+// router.put('/:id', authenticateParent, authorizeParent, TaskController.update)
+// router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete)
 
-router.patch('/:id', authenticateChild, TaskController.accept)
+// router.patch('/:id', authenticateChild, TaskController.accept)
 
-router.get('/:id', authenticateParentOrChild, TaskController.fetchOne)
-router.get('/', authenticateParentOrChild, TaskController.fetchAll)
+// router.get('/:id', authenticateParentOrChild, TaskController.fetchOne)
+// router.get('/', authenticateParentOrChild, TaskController.fetchAll)
 
-router.post('/', authenticateParent, TaskController.add)
+// router.post('/', authenticateParent, TaskController.add)
 
 module.exports = router
