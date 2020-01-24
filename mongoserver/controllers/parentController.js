@@ -35,7 +35,6 @@ class ParentController {
                     familyId: parent.familyId
                 }
                 let token = generateToken(payload)
-                console.log(token, 'ini token')
                 res.status(200).json({token, parent})
             })
             .catch(next)

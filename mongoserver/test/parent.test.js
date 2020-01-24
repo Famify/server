@@ -175,5 +175,22 @@ describe('Parent Routes', function() {
             })
         })
     })
-    describe('POST')
+    describe('POST /parents/signin', function() {
+        describe('success process', function() {
+            it ('should send an object (token, parent) with 200 status code', function(done) {
+                chai.request(app)
+                .post('/parents/signin')
+                .send({
+                    identity: 'test',
+                    password: '12345678'
+                })
+                .end(function(err, res) {
+                    expect(err).to.be.null
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object').to.have.any.keys('token','parent')
+                    done()
+                })
+            })
+        })
+    })
 })
