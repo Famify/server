@@ -1,4 +1,5 @@
 const Reward = require('../models/reward')
+const Child = require('../models/child')
 
 class RewardController {
 
@@ -61,6 +62,26 @@ class RewardController {
     Reward
       .findByIdAndDelete(req.params.id)
       .then(_ => res.status(200).json({ message: 'Hadiah telah dihapus.' }))
+      .catch(next)
+  }
+
+  static claimReward(req, res, next) {
+    let points
+    Reward
+      .findById(req.params.id)
+      .then (reward => {
+          points = reward.points
+          return Child.findById(req.loggedUser._id)
+      })
+      .then (child => {
+        if (child.point < points) throw ({ message: 'Poin tidak mencukupi.'})
+        else return Reward.findByIdAndUpdate(req.params.id, {
+          status: false
+        }, {new: true})
+      })
+      .then (reward => {
+        res.status(200).json(reward)
+      })
       .catch(next)
   }
 }

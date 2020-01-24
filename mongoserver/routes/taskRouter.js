@@ -16,6 +16,6 @@ router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete
 router.get('/:id', authenticateParentOrChild, TaskController.fetchOne)
 router.get('/', authenticateParentOrChild, TaskController.fetchAll)
 
-router.post('/', authenticateParent, TaskController.add)
+// router.post('/', authenticateParent, TaskController.add)
 
 module.exports = router
