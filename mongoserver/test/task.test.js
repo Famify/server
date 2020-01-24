@@ -16,7 +16,7 @@ let wrongTaskId = '5e2a9096a8cbfc79123feed9'
 
 describe('CRUD tasks', () => {
 
-  beforeEach((done) => {
+  beforeEach(done => {
     Parent
       .create({
         username: 'initial',
@@ -343,7 +343,8 @@ describe('CRUD tasks', () => {
           title: 'Task',
           description: 'Task my children can work on',
           points: 1000,
-          deadline: '2020-02-20'
+          deadline: '2020-02-20',
+          image: 'https://picsum.photos/200/300'
         })
         .set('access_token', currentAccessToken)
         .end((err, res) => {

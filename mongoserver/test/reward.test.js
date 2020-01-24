@@ -4,12 +4,13 @@ const app = require('../app')
 const { generateToken } = require('../helpers/jwt')
 
 const Parent = require('../models/parent')
+const Child = require('../models/child')
 const Reward = require('../models/reward')
 
 const expect = chai.expect
 chai.use(chaiHttp)
 
-let currentAccessToken, familyId, rewardId, currentAccessToken2, familyId2, rewardId2
+let currentAccessToken, familyId, rewardId, currentAccessToken2, familyId2, rewardId2, tokenChild1, tokenChild2
 
 let wrongRewardId = '5e2a9096a8cbfc79123feed9'
 
@@ -34,6 +35,44 @@ describe('CRUD rewards', () => {
         }
         currentAccessToken = generateToken(payload)
         familyId = parent.familyId
+
+        return Child.create({
+          username: 'anakSulung',
+          familyId,
+          dateOfBirth: new Date(),
+          point: 5000,
+          password: '12345678'
+        })
+      })
+      .then(child => {
+        const payload = {
+          _id: child._id,
+          username: child.username,
+          email: child.email,
+          role: child.role,
+          familyId: child.familyId
+        }
+
+        tokenChild1 = generateToken(payload)
+
+        return Child.create({
+          username: 'anakBungsu',
+          familyId,
+          dateOfBirth: new Date(),
+          point: 100,
+          password: '12345678'
+        })
+      })
+      .then(child => {
+        const payload = {
+          _id: child._id,
+          username: child.username,
+          email: child.email,
+          role: child.role,
+          familyId: child.familyId
+        }
+
+        tokenChild2 = generateToken(payload)
 
         return Parent
           .create({
@@ -89,6 +128,7 @@ describe('CRUD rewards', () => {
     Parent
       .deleteMany()
       .then(() => Reward.deleteMany())
+      .then(() => Child.deleteMany())
       .then(() => done())
       .catch(err => console.log(err))
   })
@@ -410,4 +450,46 @@ describe('CRUD rewards', () => {
         })
     })
   })
+
+  describe('CLAIM /rewards/:id', () => {
+    it('when successful should change reward status', done => {
+      chai
+        .request(app)
+        .patch('/rewards/' + rewardId)
+        .set('access_token', tokenChild1)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(200)
+          expect(res.body).to.be.an('object').to.have.keys('status', '_id', 'title', 'description', 'points', 'familyId', '__v')
+          expect(res.body.status).to.equal(false)
+          done()
+        })
+    })
+    it('should return an error message when a wrong rewardId is inputted', done => {
+      chai
+        .request(app)
+        .patch('/rewards/' + wrongRewardId)
+        .set('access_token', tokenChild1)
+        .end((err, res) => {
+          expect(err).to.be.null
+          expect(res).to.have.status(404)
+          expect(res.error.text).to.equal('{"error":["Data tidak ditemukan."]}')
+          done()
+        })
+    })
+    it('should return an error message when a wrong token is inputted', done => {
+      chai
+        .request(app)
+        .patch('/rewards/' + wrongRewardId)
+        .set('access_token', '12ytu1gewhehjwqjh')
+        .end((err, res) => {
+          expect(err).to.be.null
+          console.log(res.error , 'ini error2')
+          expect(res).to.have.status(401)
+          expect(res.error.text).to.equal('{"error":["Mohon sign in terlebih dahulu."]}')
+          done()
+        })
+    })
+  })
+
 })
