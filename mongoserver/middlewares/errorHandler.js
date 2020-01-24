@@ -1,5 +1,5 @@
 function errorHandler(err, req, res, next) {
-  // console.log('err handler atas', err.message)
+  // console.log('err handler atas', err)
 
   let status, message, error = []
 

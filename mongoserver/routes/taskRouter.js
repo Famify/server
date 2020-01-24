@@ -9,6 +9,8 @@ const authorizeParent = require('../middlewares/authorizeParentTask')
 router.put('/:id', authenticateParent, authorizeParent, TaskController.update)
 router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete)
 
+router.patch('/:id', authenticateChild, TaskController.accept)
+
 router.get('/:id', authenticateParentOrChild, TaskController.fetchOne)
 router.get('/', authenticateParentOrChild, TaskController.fetchAll)
 

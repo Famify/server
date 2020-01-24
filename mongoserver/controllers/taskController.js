@@ -3,7 +3,7 @@ const Task = require('../models/task')
 class TaskController {
 
   static add(req, res, next) {
-    const { title, description, points, image } = req.body
+    const { title, description, points, image, deadline } = req.body
     Task
       .create({
         title, description, points, familyId: req.loggedUser.familyId, image, deadline
