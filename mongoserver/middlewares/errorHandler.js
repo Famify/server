@@ -11,7 +11,7 @@ function errorHandler(err, req, res, next) {
     
   } else if (err.name === 'CastError') {
     status = 404
-    error.push('data not found')
+    error.push('Data tidak ditemukan.')
 
   } else if (err.name === 'JsonWebTokenError') {
     status = 401

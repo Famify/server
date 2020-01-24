@@ -10,7 +10,7 @@ const parentSchema = new Schema({
             {validator: isUsernameUnique, message: 'nama pengguna telah digunakan'}
         ]
     },
-    DateOfBirth: {
+    dateOfBirth: {
         type: Date,
         required: [true, 'tanggal lahir wajib diisi']
     },
