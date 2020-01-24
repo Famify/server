@@ -18,9 +18,18 @@ class RewardController {
 
   static fetchAll(req, res, next) {
     Reward
-      .find()
+      .find({ familyId: req.loggedUser._id })
       .then(allRewards => {
         res.status(200).json(allRewards)
+      })
+      .catch(next)
+  }
+
+  static fetchOne(req, res, next) {
+    Reward
+      .find({ _id: req.params.id, familyId: req.loggedUser.familyId })
+      .then(reward => {
+        res.status(200).json(reward[0])
       })
       .catch(next)
   }
