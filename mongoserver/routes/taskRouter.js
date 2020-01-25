@@ -26,6 +26,6 @@ router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete
 router.get('/:id', authenticateParentOrChild, TaskController.fetchOne)
 router.get('/', authenticateParentOrChild, TaskController.fetchAll)
 
-router.post('/', authenticateParent, upload.single('avatar'), TaskController.add)
+router.post('/', authenticateParent, upload.single('image'), TaskController.add)
 
 module.exports = router
