@@ -18,8 +18,13 @@ class RewardController {
   }
 
   static fetchAll(req, res, next) {
+    let options = { familyId: req.loggedUser.familyId }
+
+    const { status } = req.query
+    if (status) options.status = status
+
     Reward
-      .find({ familyId: req.loggedUser._id })
+      .find(options)
       .then(allRewards => {
         res.status(200).json(allRewards)
       })
