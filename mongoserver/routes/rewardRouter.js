@@ -9,7 +9,6 @@ const authorizeParent = require('../middlewares/authorizeParentReward')
 
 router.patch('/:id', authenticateChild, authorizeParent, RewardController.claimReward)
 
-
 router.put('/:id', authenticateParent, authorizeParent, RewardController.update)
 router.delete('/:id', authenticateParent, authorizeParent, RewardController.delete)
 
