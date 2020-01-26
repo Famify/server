@@ -14,6 +14,7 @@ const upload = gcsUpload({
   })
 
 router.post('/signup', upload.single('avatar'), ParentController.register)
+router.patch('/complete/:_id', authenticateParent, upload.single('avatar'), ParentController.update)
 router.post('/signin', ParentController.login)
 router.get('/', authenticateParent, ParentController.findAll)
 

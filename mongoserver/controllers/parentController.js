@@ -4,9 +4,7 @@ const { generateToken, verifyToken } = require('../helpers/jwt')
 
 class ParentController {
 
-    static register(req, res, next) {
-      console.log('register kepanggil');
-      
+    static register(req, res, next) {      
         const { username, dateOfBirth, password, email, avatar, familyId } = req.body
         Parent.create({ username, dateOfBirth, password, email, avatar, familyId}) 
                 .then((newParent) => {
@@ -43,6 +41,16 @@ class ParentController {
     static findAll(req, res, next) {
         const familyId = req.loggedUser.familyId
         Parent.find({ familyId })
+            .then(parent => {
+                res.status(200).json(parent)
+            })
+            .catch(next)
+    }
+
+    static update(req, res, next) {
+        const { dateOfBirth, avatar} = req.body
+        const { _id } = req.params
+        Parent.findByIdAndUpdate(_id, { dateOfBirth, avatar }, { new: true })
             .then(parent => {
                 res.status(200).json(parent)
             })

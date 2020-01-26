@@ -11,8 +11,7 @@ const parentSchema = new Schema({
         ]
     },
     dateOfBirth: {
-        type: Date,
-        required: [true, 'tanggal lahir wajib diisi']
+        type: Date
     },
     email: {
         type: String,
