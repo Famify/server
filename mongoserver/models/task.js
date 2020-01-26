@@ -14,7 +14,7 @@ const taskSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['unclaimed', 'claimed', 'finished'],
+    enum: ['unclaimed', 'claimed', 'finished', 'expired'],
     default: 'unclaimed'
   },
   familyId: {

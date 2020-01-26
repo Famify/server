@@ -73,6 +73,16 @@ class TaskController {
           message: 'Tugas telah diklaim.'
         }
 
+        if (task.status === 'finished') throw {
+          status: 403,
+          message: 'Tugas telah diselesaikan.'
+        }
+
+        if (task.status === 'expired') throw {
+          status: 403,
+          message: 'Tugas sudah tidak berlaku.'
+        }
+
         task.status = 'claimed'
         task.childId = req.loggedUser._id
         task.save()
@@ -90,17 +100,43 @@ class TaskController {
         { _id: req.params.id, familyId: req.loggedUser.familyId },
       )
       .then(task => {
+
         if (task.status === 'finished') throw {
           status: 403,
           message: 'Tugas telah diselesaikan.'
         }
 
+        if (task.status === 'expired') throw {
+          status: 403,
+          message: 'Tugas sudah tidak berlaku.'
+        }
+
         task.status = 'finished'
-        task.childId = req.loggedUser._id
         task.save()
 
         res.status(200).json({
           finishedTask: task, message: 'Sukses mengubah status tugas menjadi selesai.'
+        })
+      })
+      .catch(next)
+  }
+
+  static expire(req, res, next) {
+    Task
+      .findOne(
+        { _id: req.params.id, familyId: req.loggedUser.familyId },
+      )
+      .then(task => {
+        if (task.status === 'expired') throw {
+          status: 403,
+          message: 'Tugas sudah tidak berlaku.'
+        }
+
+        task.status = 'expired'
+        task.save()
+
+        res.status(200).json({
+          finishedTask: task, message: 'Sukses mengubah status tugas menjadi `tidak berlaku`.'
         })
       })
       .catch(next)

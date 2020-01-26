@@ -18,7 +18,8 @@ const upload = gcsUpload({
 })
 
 router.patch('/:id/claim', authenticateChild, TaskController.claim)
-router.patch('/:id/finish', authenticateParent, TaskController.finish)
+router.patch('/:id/finish', authenticateChild, upload.single('image'),TaskController.finish)
+router.patch('/:id/expire', authenticateParent, TaskController.expire)
 
 router.put('/:id', authenticateParent, authorizeParent, upload.single('image'),TaskController.update)
 router.delete('/:id', authenticateParent, authorizeParent, TaskController.delete)
