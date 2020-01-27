@@ -22,8 +22,7 @@ const taskSchema = new Schema({
     required: [true, 'familyID harus diisi.']
   },
   childId: {
-    type: Types.ObjectId,
-    default: ''
+    type: Types.ObjectId
   },
   image: {
     type: String
