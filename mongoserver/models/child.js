@@ -29,7 +29,8 @@ const childSchema = new Schema({
         required: [true, 'tanggal lahir wajib diisi']
     },
     point: {
-        type: Number
+        type: Number,
+        default: 0
     },
     rewardsHistory: [{
         type: Schema.Types.ObjectId
