@@ -25,7 +25,7 @@ router.post("/signin", ChildController.login);
 router.get("/", authenticateParentOrChild, ChildController.findAll);
 router.patch(
   "/:_id",
-  authenticateParent,
+  authenticateParentOrChild,
   upload.single("avatar"),
   ChildController.edit
 );
