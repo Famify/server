@@ -68,6 +68,41 @@ class ChildController {
         .catch(next)
     }
 
+    static addPoint(req, res, next) {
+        const _id = req.params._id
+        const deltaPoint = req.body.point
+        let newPoint
+        Child.findById(_id)
+            .then(child => {
+                newPoint = child.point + deltaPoint
+                return Child.findByIdAndUpdate(_id, {
+                    point: newPoint
+                }, { new: true })
+            })
+            .then(child => {
+                res.status(200).json(child)
+            })
+            .catch(next)
+    }
+
+    static minPoint(req, res, next) {
+        const _id = req.params._id
+        const deltaPoint = req.body.point
+        let newPoint
+        Child.findById(_id)
+            .then(child => {
+                if (child.point - deltaPoint < 0) throw { message: 'pengurangan point tidak valid'}
+                newPoint = child.point - deltaPoint
+                return Child.findByIdAndUpdate(_id, {
+                    point: newPoint
+                }, { new: true })
+            })
+            .then(child => {
+                res.status(200).json(child)
+            })
+            .catch(next)
+    }
+
 }
 
 module.exports = ChildController

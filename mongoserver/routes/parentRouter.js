@@ -2,6 +2,7 @@ const router = require('express').Router()
 const ParentController = require('../controllers/parentController')
 const gcsUpload = require('gcs-upload')
 const authenticateParent = require('../middlewares/authenticateParent')
+const authenticateParentOrChild = require('../middlewares/authenticateParentOrChild')
 
 const upload = gcsUpload({
   limits: {
@@ -13,7 +14,7 @@ const upload = gcsUpload({
   }
 })
 
-router.get('/', authenticateParent, ParentController.findAll)
+router.get('/', authenticateParentOrChild, ParentController.findAll)
 router.post('/signup', upload.single('avatar'), ParentController.register)
 router.post('/signin', ParentController.login)
 router.patch('/:_id', authenticateParent, upload.single('avatar'), ParentController.update)

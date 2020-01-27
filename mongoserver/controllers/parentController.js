@@ -49,7 +49,7 @@ class ParentController {
 
     static update(req, res, next) {
         const { dateOfBirth, avatar} = req.body
-        const { _id } = req.params
+        const { _id } = req.loggedUser
         Parent.findByIdAndUpdate(_id, { dateOfBirth, avatar }, { new: true })
             .then(parent => {
                 res.status(200).json(parent)
