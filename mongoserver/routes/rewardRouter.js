@@ -17,7 +17,7 @@ const upload = gcsUpload({
   }
 })
 
-router.patch('/:id', authenticateChild, authorizeParent, RewardController.claimReward)
+router.patch('/:id', authenticateChild, RewardController.claimReward)
 
 router.put('/:id', authenticateParent, authorizeParent, upload.single('image'), RewardController.update)
 router.delete('/:id', authenticateParent, authorizeParent, RewardController.delete)
