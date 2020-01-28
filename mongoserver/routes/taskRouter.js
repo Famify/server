@@ -22,7 +22,7 @@ const uploadUnggah = unggah({
 router.patch("/:id/claim", authenticateChild, TaskController.claim);
 router.patch(
   "/:id/finish",
-  authenticateChild,
+  authenticateParent,
   uploadUnggah.single("image"),
   TaskController.finish
 );

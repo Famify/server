@@ -1,5 +1,5 @@
 node_modules
 coverage
 .nyc_output
-.keyfile.json
+googleKeyfile.json
 .env
