@@ -44,7 +44,7 @@ const childSchema = new Schema(
     avatar: {
       type: String,
     },
-    expoToken: {
+    tokenExpo: {
       type: String,
     },
   },

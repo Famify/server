@@ -13,7 +13,6 @@ class ChildController {
       password,
       familyId,
       avatar,
-      expoToken,
     })
       .then(newChild => {
         res.status(201).json(newChild);
@@ -32,6 +31,13 @@ class ChildController {
         let passwordDb = child.password;
         let isPassword = checkPassword(passwordInput, passwordDb);
         if (!isPassword) throw { message: "identitas atau kata sandi salah" };
+        return Child.findOneAndUpdate(
+          { _id: child._id },
+          { tokenExpo: req.body.tokenExpo },
+          { new: true }
+        );
+      })
+      .then(child => {
         let payload = {
           _id: child._id,
           username: child.username,

@@ -27,6 +27,7 @@ class ParentController {
   }
 
   static login(req, res, next) {
+    console.log(req.body, "ini body");
     if (!req.body.identity) throw { message: "identitas wajib diisi" };
     if (!req.body.password) throw { message: "kata sandi wajib diisi" };
 
@@ -39,6 +40,16 @@ class ParentController {
         let passwordDb = parent.password;
         let isPassword = checkPassword(passwordInput, passwordDb);
         if (!isPassword) throw { message: "identitas atau password salah" };
+
+        return Parent.findOneAndUpdate(
+          { _id: parent._id },
+          {
+            tokenExpo: req.body.tokenExpo,
+          },
+          { new: true }
+        );
+      })
+      .then(parent => {
         let payload = {
           _id: parent._id,
           username: parent.username,
