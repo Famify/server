@@ -7,7 +7,14 @@ class ChildController {
     const { username, password, avatar } = req.body;
     const familyId = req.loggedUser.familyId;
     const dateOfBirth = new Date(req.body.dateOfBirth);
-    Child.create({ username, dateOfBirth, password, familyId, avatar })
+    Child.create({
+      username,
+      dateOfBirth,
+      password,
+      familyId,
+      avatar,
+      expoToken,
+    })
       .then(newChild => {
         res.status(201).json(newChild);
       })
@@ -73,9 +80,7 @@ class ChildController {
 
   static addPoint(req, res, next) {
     const _id = req.params._id;
-    console.log(_id);
     const deltaPoint = req.body.point;
-    console.log(deltaPoint);
     let newPoint;
     Child.findById(_id)
       .then(child => {
