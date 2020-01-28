@@ -49,7 +49,7 @@ const parentSchema = new Schema(
       type: String,
       default: "parent",
     },
-    expoToken: {
+    tokenExpo: {
       type: String,
     },
   },

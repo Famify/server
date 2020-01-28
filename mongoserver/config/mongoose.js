@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-let mongoUri = `mongodb://localhost:27017/famify-${process.env.NODE_ENV}`;
-// let mongoUri = process.env.MONGO_URI;
+// let mongoUri = `mongodb://localhost:27017/famify-${process.env.NODE_ENV}`;
+let mongoUri = process.env.MONGO_URI;
 
 const mongoConfig = {
   useCreateIndex: true,
