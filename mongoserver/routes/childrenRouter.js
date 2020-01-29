@@ -27,6 +27,7 @@ router.patch("/:_id/add", authenticateParent, ChildController.addPoint);
 router.patch("/:_id/min", authenticateChild, ChildController.minPoint);
 router.post("/signin", ChildController.login);
 router.get("/", authenticateParentOrChild, ChildController.findAll);
+router.get("/user", authenticateChild, ChildController.findUser);
 router.patch(
   "/:_id",
   authenticateParentOrChild,
