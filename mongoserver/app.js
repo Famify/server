@@ -8,7 +8,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const routes = require("./routes/index");
 const errorHandler = require("./middlewares/errorHandler");
-const PORT = process.env.NODE_ENV === "testing" ? 4000 : 3000;
+const PORT = process.env.NODE_ENV === "testing" ? 4000 : process.env.PORT;
 const app = express();
 
 app.use(cors());
