@@ -31,7 +31,8 @@ module.exports = (req, res, next) => {
           username: parent.username,
           email: parent.email,
           role: parent.role,
-          familyId: parent.familyId
+          familyId: parent.familyId,
+          avatar: parent.avatar
         }
       }
 
@@ -40,7 +41,8 @@ module.exports = (req, res, next) => {
           _id: child._id,
           username: child.username,
           role: child.role,
-          familyId: child.familyId
+          familyId: child.familyId,
+          avatar: child.avatar
         }
       }
 
