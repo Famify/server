@@ -20,6 +20,15 @@ class ChildController {
       .catch(next);
   }
 
+  static findUser(req,res,next){
+   Child.findOne({ _id : req.loggedUser._id })
+    .populate("rewardsHistory")
+    .then(user=>{
+      res.status(200).json(user)
+    })
+    .catch(next)
+  }
+
   static login(req, res, next) {
     if (!req.body.identity) throw { message: "identitas wajib diisi" };
     if (!req.body.password) throw { message: "kata sandi wajib diisi" };

@@ -39,6 +39,7 @@ const childSchema = new Schema(
     rewardsHistory: [
       {
         type: Schema.Types.ObjectId,
+        ref: 'Reward'
       },
     ],
     avatar: {
