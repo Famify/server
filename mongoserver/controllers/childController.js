@@ -23,6 +23,7 @@ class ChildController {
   static login(req, res, next) {
     if (!req.body.identity) throw { message: "identitas wajib diisi" };
     if (!req.body.password) throw { message: "kata sandi wajib diisi" };
+    console.log(req.body);
 
     Child.findOne({ username: req.body.identity })
       .then(child => {
